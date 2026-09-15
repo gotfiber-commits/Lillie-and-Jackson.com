@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#1F3A33" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Wedding Planner</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Ccircle cx=%2725%27 cy=%2734%27 r=%2714%27 fill=%27none%27 stroke=%27%231F3A33%27 stroke-width=%274%27/%3E%3Ccircle cx=%2739%27 cy=%2734%27 r=%2714%27 fill=%27none%27 stroke=%27%23C2A36B%27 stroke-width=%274%27/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Sign in and first-run setup -->
+  <section id="auth" class="login" hidden>
+    <div class="login-card" id="login-card">
+      <div class="login-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="56" height="56"><circle cx="25" cy="34" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="39" cy="34" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M32 8l4 6h-8z" fill="currentColor"/></svg>
+      </div>
+      <h1 class="login-title">Wedding Planner</h1>
+      <p class="login-sub">Sign in to manage the budget, guests, accounts and website.</p>
+      <form id="login-form" autocomplete="on">
+        <label class="field">
+          <span>Username</span>
+          <input name="username" autocomplete="username" autocapitalize="none" required />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <div class="pw-wrap">
+            <input name="password" type="password" autocomplete="current-password" required />
+            <button type="button" class="pw-toggle" data-act="togglePw" aria-label="Show password">Show</button>
+          </div>
+        </label>
+        <label class="check-row">
+          <input type="checkbox" name="remember" checked />
+          <span>Keep me signed in for 30 days</span>
+        </label>
+        <p id="login-error" class="form-error" role="alert"></p>
+        <button class="btn primary block" type="submit" id="login-btn">Sign in</button>
+      </form>
+      <p class="login-foot"><a href="/">View the wedding website</a></p>
+    </div>
+
+    <div class="login-card wide" id="setup-card" hidden>
+      <div class="login-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="56" height="56"><circle cx="25" cy="34" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="39" cy="34" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M32 8l4 6h-8z" fill="currentColor"/></svg>
+      </div>
+      <h1 class="login-title">Create the admin account</h1>
+      <p class="login-sub">This one-time step sets up the account that manages users, the website and the planner. Enter the setup key you saved in Netlify as SETUP_KEY.</p>
+      <form id="setup-form" autocomplete="off">
+        <label class="field">
+          <span>Setup key</span>
+          <input name="setupKey" type="password" autocomplete="off" required />
+        </label>
+        <label class="field">
+          <span>Your name</span>
+          <input name="name" autocomplete="name" required />
+        </label>
+        <label class="field">
+          <span>Username</span>
+          <input name="username" autocomplete="username" autocapitalize="none" required pattern="[A-Za-z0-9._\-]{3,32}" />
+          <small>3 to 32 letters, numbers, dots, dashes or underscores</small>
+        </label>
+        <div class="form-grid">
+          <label class="field">
+            <span>Password</span>
+            <input name="password" type="password" autocomplete="new-password" minlength="8" required />
+          </label>
+          <label class="field">
+            <span>Confirm password</span>
+            <input name="confirm" type="password" autocomplete="new-password" minlength="8" required />
+          </label>
+        </div>
+        <p id="setup-error" class="form-error" role="alert"></p>
+        <button class="btn primary block" type="submit" id="setup-btn">Create admin account</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- App -->
+  <div id="app" class="app" hidden>
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-names" id="brand-names">Our Wedding</span>
+        <span class="brand-date" id="brand-date"></span>
+      </div>
+      <nav id="side-nav" class="side-nav" aria-label="Main"></nav>
+      <div class="side-foot">
+        <div class="side-user">
+          <span id="user-chip" class="user-chip"></span>
+          <span id="sync-status" class="sync" aria-live="polite"></span>
+        </div>
+        <button class="link-btn" data-act="logout">Sign out</button>
+      </div>
+    </aside>
+
+    <main id="view" class="view" tabindex="-1"></main>
+
+    <nav id="bottom-nav" class="bottom-nav" aria-label="Main"></nav>
+  </div>
+
+  <div id="modal-root"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="data.js"></script>
+  <script src="accounting.js"></script>
+  <script src="local.js"></script>
+  <script src="admin.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
