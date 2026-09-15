@@ -78,6 +78,7 @@
     const registry = (s.registry || []).filter((r) => r.name && safeUrl(r.url));
     const faq = (s.faq || []).filter((f) => f.q && f.a);
     const rsvpOpen = Boolean(s.rsvp && s.rsvp.enabled);
+    const heroList = (Array.isArray(s.heroPhotos) && s.heroPhotos.length ? s.heroPhotos : [s.heroPhoto]).filter(Boolean);
     const hasStory = Boolean(s.story && (s.story.body || s.story.photo));
 
     const nav = [
@@ -104,9 +105,10 @@
         </nav>
       </header>
 
-      <section class="hero ${s.heroPhoto ? "has-photo" : ""}" id="top">
-        ${s.heroPhoto ? `<img class="hero-img" src="${photo(s.heroPhoto)}" alt="${esc(n1)} and ${esc(n2)}" fetchpriority="high"/>` : ""}
+      <section class="hero ${heroList.length ? "has-photo" : ""} h-${["full", "mid", "short"].includes(s.heroHeight) ? s.heroHeight : "mid"}" id="top">
+        ${heroList.map((id, i) => `<img class="hero-img ${i === 0 ? "on" : ""}" src="${photo(id)}" alt="${i === 0 ? `${esc(n1)} and ${esc(n2)}` : ""}" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}/>`).join("")}
         <div class="hero-shade"></div>
+        ${heroList.length > 1 ? `<div class="hero-dots" role="tablist" aria-label="Cover photos">${heroList.map((_, i) => `<button type="button" class="dot ${i === 0 ? "on" : ""}" data-slide="${i}" aria-label="Photo ${i + 1}"></button>`).join("")}</div>` : ""}
         <div class="hero-content">
           ${s.headline ? `<p class="hero-lead">${esc(s.headline)}</p>` : ""}
           <h1 class="hero-names"><span>${esc(n1)}</span><span class="amp">&amp;</span><span>${esc(n2)}</span></h1>
@@ -250,6 +252,26 @@
 
     root.removeAttribute("aria-busy");
     wire(s, events, gallery);
+    startSlideshow(heroList.length);
+  }
+
+  function startSlideshow(count) {
+    if (count < 2) return;
+    const imgs = [...document.querySelectorAll(".hero-img")];
+    const dots = [...document.querySelectorAll(".hero-dots .dot")];
+    let idx = 0, timer = null;
+    const show = (i) => {
+      idx = (i + count) % count;
+      imgs.forEach((img, k) => img.classList.toggle("on", k === idx));
+      dots.forEach((d, k) => d.classList.toggle("on", k === idx));
+    };
+    const auto = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const start = () => { if (auto && !timer) timer = setInterval(() => show(idx + 1), 6000); };
+    const stop = () => { clearInterval(timer); timer = null; };
+    dots.forEach((d) => d.addEventListener("click", () => { stop(); show(Number(d.dataset.slide)); start(); }));
+    // Pause while the tab is hidden so slides don't jump when you come back
+    document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+    start();
   }
 
   function rsvpSection(s) {

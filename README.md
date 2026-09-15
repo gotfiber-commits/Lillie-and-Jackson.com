@@ -46,7 +46,9 @@ netlify deploy --build --prod
 
 In the planner, open **Website & users**.
 
-- **Website tab**: edit the welcome text and names, your story, events (with addresses for directions), wedding party, travel and hotels, registry links, and questions and answers. Choose a cover photo and a story photo. Use **Copy details from planner** to pull in names, date, city and venue.
+- **Website tab**: edit the welcome text and names, your story, events (with addresses for directions), wedding party, travel and hotels, registry links, and questions and answers. Choose cover photos and a story photo. Use **Copy details from planner** to pull in names, date, city and venue.
+- **Cover photo size**: in the Welcome card's Edit form, choose Banner, Standard (the default, about two-thirds of the screen) or Full screen. Smaller sizes crop close-up photos less, and the photo is positioned to keep faces near the top of the frame in view.
+- **Cover slideshow**: add more than one cover photo in the Welcome card and the home page fades through them in order, changing every 6 seconds, with dots guests can tap to jump between photos. Use the arrows on each thumbnail to reorder and the X to remove.
 - **Photos tab**: upload photos. They're resized in the browser to web size before uploading. Checked photos appear in the gallery in the order shown.
 - **RSVP**: turn on online RSVPs, set a reply-by date, meal choices and party size.
 - **Preview website** shows the draft only to admins. **Publish website** makes it public.

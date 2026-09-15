@@ -30,7 +30,7 @@
       headline: "We're getting married",
       intro: "We can't wait to celebrate with the people we love most. Here's everything you need to know about the day.",
       hashtag: "", contactEmail: "", footerNote: "",
-      heroPhoto: "",
+      heroPhoto: "", heroPhotos: [], heroHeight: "mid",
       story: { title: "Our story", body: "", photo: "", photo2: "" },
       events: [
         { id: uid(), title: "Ceremony", date: s.date || "", time: "16:00", endTime: "", venue: s.venue || "", address: "", dress: "", notes: "" },
@@ -50,7 +50,11 @@
     out.story = { ...d.story, ...(x && x.story) };
     out.travel = { ...d.travel, ...(x && x.travel) };
     out.rsvp = { ...d.rsvp, ...(x && x.rsvp) };
-    for (const k of ["events", "party", "registry", "faq", "photos"]) if (!Array.isArray(out[k])) out[k] = d[k];
+    for (const k of ["events", "party", "registry", "faq", "photos", "heroPhotos"]) if (!Array.isArray(out[k])) out[k] = d[k];
+    // Older content stored a single cover photo
+    if (!out.heroPhotos.length && out.heroPhoto) out.heroPhotos = [out.heroPhoto];
+    if (!["full", "mid", "short"].includes(out.heroHeight)) out.heroHeight = "mid";
+    out.heroPhoto = out.heroPhotos[0] || "";
     if (!Array.isArray(out.travel.hotels)) out.travel.hotels = [];
     return out;
   }
@@ -238,7 +242,7 @@
     const hasNames = site.name1 && site.name2;
     const answered = site.faq.filter((f) => f.a).length;
     const ready = [
-      [hasNames, "Couple's names"], [Boolean(site.date), "Wedding date"], [Boolean(site.heroPhoto), "Cover photo"],
+      [hasNames, "Couple's names"], [Boolean(site.date), "Wedding date"], [site.heroPhotos.length > 0, "Cover photo"],
       [Boolean(site.story.body), "Your story"], [site.events.some((e) => e.venue), "Event venues"], [site.rsvp.enabled, "Online RSVP"],
     ];
     return `
@@ -260,8 +264,19 @@
       <div class="admin-grid">
         <section class="panel">
           <div class="panel-head"><h2>Welcome</h2><button class="btn small" data-act="adminEditWelcome">Edit</button></div>
+          <div class="cover-strip" role="group" aria-label="Cover photos">
+            ${site.heroPhotos.map((id, i) => `<span class="cover-item">
+              <img class="thumb wide" src="${photoUrl(id)}" alt="Cover photo ${i + 1}"/>
+              <span class="cover-tools">
+                <button class="icon-btn small" data-act="adminHeroMove" data-i="${i}" data-dir="-1" ${i === 0 ? "disabled" : ""} aria-label="Move earlier">&larr;</button>
+                <button class="icon-btn small" data-act="adminHeroRemove" data-i="${i}" aria-label="Remove from cover">&times;</button>
+                <button class="icon-btn small" data-act="adminHeroMove" data-i="${i}" data-dir="1" ${i === site.heroPhotos.length - 1 ? "disabled" : ""} aria-label="Move later">&rarr;</button>
+              </span>
+            </span>`).join("")}
+            <button class="cover-add" data-act="adminChooseHero">${icon("plus")}<span>${site.heroPhotos.length ? "Add cover photo" : "Choose cover photo"}</span></button>
+          </div>
+          <p class="sub" style="margin:4px 0 14px">${site.heroPhotos.length > 1 ? "The home page fades through these photos in order, changing every few seconds." : "Add more than one photo and the home page will fade through them."}</p>
           <div class="hero-edit">
-            <button class="hero-thumb" data-act="adminChooseHero" aria-label="Choose cover photo">${thumb(site.heroPhoto, "thumb wide")}<span>Cover photo</span></button>
             <div>
               <div class="strong big-names">${esc(site.name1 || "Name")} &amp; ${esc(site.name2 || "Name")}</div>
               <div class="sub">${esc(site.headline)}</div>
@@ -309,7 +324,7 @@
   }
 
   function photosTab() {
-    const used = (id) => [site.heroPhoto === id ? "Cover" : "", site.story.photo === id || site.story.photo2 === id ? "Story" : "", site.party.some((p) => p.photo === id) ? "Wedding party" : ""].filter(Boolean);
+    const used = (id) => [site.heroPhotos.includes(id) ? "Cover" : "", site.story.photo === id || site.story.photo2 === id ? "Story" : "", site.party.some((p) => p.photo === id) ? "Wedding party" : ""].filter(Boolean);
     const gallery = site.photos.filter((p) => p.gallery);
     return `
       <section class="panel">
@@ -552,6 +567,11 @@
           { key: "date", label: "Wedding date", type: "date" },
           { key: "city", label: "City and state", placeholder: "Florence, Alabama" },
           { key: "headline", label: "Headline", placeholder: "We're getting married" },
+          { key: "heroHeight", label: "Cover photo size", type: "select", options: [
+            { value: "short", label: "Banner (shortest)" },
+            { value: "mid", label: "Standard (about two-thirds of the screen)" },
+            { value: "full", label: "Full screen" },
+          ], hint: "Smaller sizes crop close-up photos less." },
           { key: "hashtag", label: "Wedding hashtag", placeholder: "#SamAndAlex2027" },
           { key: "intro", label: "Welcome message", type: "textarea", rows: 3 },
           { key: "contactEmail", label: "Contact email for guests", type: "email" },
@@ -601,7 +621,27 @@
         onSave(v) { v.maxParty = Math.min(Math.max(num(v.maxParty) || 1, 1), 10); Object.assign(site.rsvp, v); saveSite("RSVP settings saved"); },
       });
     },
-    adminChooseHero() { pickPhoto("Choose a cover photo", site.heroPhoto, (id) => { site.heroPhoto = id; saveSite(id ? "Cover photo set" : "Cover photo removed"); }); },
+    adminChooseHero() {
+      pickPhoto("Add a cover photo", "", (id) => {
+        if (!id) return;
+        if (site.heroPhotos.includes(id)) { toast("That photo is already in the cover rotation."); return; }
+        site.heroPhotos.push(id);
+        site.heroPhoto = site.heroPhotos[0];
+        saveSite("Cover photo added");
+      });
+    },
+    adminHeroMove(el) {
+      const i = Number(el.dataset.i), j = i + Number(el.dataset.dir);
+      if (j < 0 || j >= site.heroPhotos.length) return;
+      [site.heroPhotos[i], site.heroPhotos[j]] = [site.heroPhotos[j], site.heroPhotos[i]];
+      site.heroPhoto = site.heroPhotos[0];
+      saveSite();
+    },
+    adminHeroRemove(el) {
+      site.heroPhotos.splice(Number(el.dataset.i), 1);
+      site.heroPhoto = site.heroPhotos[0] || "";
+      saveSite("Removed from the cover rotation");
+    },
     adminChooseStory() { pickPhoto("Choose a story photo", site.story.photo, (id) => { site.story.photo = id; saveSite("Story photo updated"); }); },
     adminItemPhoto(el) {
       const item = LISTS[el.dataset.list].get().find((x) => x.id === el.dataset.id);
@@ -645,7 +685,8 @@
         toast(e.message); return;
       }
       site.photos = site.photos.filter((x) => x !== p);
-      if (site.heroPhoto === p.id) site.heroPhoto = "";
+      site.heroPhotos = site.heroPhotos.filter((id) => id !== p.id);
+      site.heroPhoto = site.heroPhotos[0] || "";
       if (site.story.photo === p.id) site.story.photo = "";
       site.party.forEach((m) => { if (m.photo === p.id) m.photo = ""; });
       saveSite("Photo deleted");

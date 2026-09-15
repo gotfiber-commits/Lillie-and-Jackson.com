@@ -506,6 +506,15 @@ details.qa ul { margin: 8px 0 0; padding-left: 20px; }
 .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
 .admin-grid > .panel + .panel { margin-top: 0; }
 .hero-edit { display: flex; gap: 16px; align-items: flex-start; }
+.cover-strip { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.cover-item { position: relative; display: inline-block; }
+.cover-tools { position: absolute; inset: auto 4px 4px 4px; display: flex; justify-content: space-between; opacity: 0; transition: opacity .15s; }
+.cover-item:hover .cover-tools, .cover-item:focus-within .cover-tools { opacity: 1; }
+.cover-tools .icon-btn { background: rgba(255,255,255,.95); }
+.cover-add { width: 150px; height: 96px; border: 1.5px dashed var(--mist); border-radius: var(--radius-sm); background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: var(--muted); font-size: 12px; font-weight: 600; }
+.cover-add:hover { border-color: var(--eucalyptus); color: var(--ink); }
+.cover-add svg { width: 18px; height: 18px; }
+@media (hover: none) { .cover-tools { opacity: 1; } }
 .hero-thumb { border: 0; background: none; padding: 0; cursor: pointer; display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); flex: none; }
 .thumb { width: 96px; height: 96px; object-fit: cover; border-radius: var(--radius-sm); display: block; background: var(--porcelain); }
 .thumb.wide { width: 150px; height: 96px; }
