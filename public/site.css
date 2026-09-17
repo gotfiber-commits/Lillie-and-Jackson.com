@@ -55,12 +55,16 @@ h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.15; m
 .hero { position: relative; min-height: clamp(460px, 68svh, 760px); display: grid; place-items: end center; text-align: center; color: #fff; overflow: hidden; background: var(--evergreen); }
 .hero.h-full { min-height: 100svh; }
 .hero.h-short { min-height: clamp(360px, 48svh, 540px); }
-.hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%; opacity: 0; transition: opacity 1.4s ease; }
-.hero-img.on { opacity: 1; }
+.hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s ease; }
+.hero-slide.on { opacity: 1; }
+.hero-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.hero-blur { display: none; }
+.hero.fit-whole .hero-blur { display: block; position: absolute; inset: -40px; width: calc(100% + 80px); height: calc(100% + 80px); object-fit: cover; filter: blur(28px) brightness(.72); }
+.hero.fit-whole .hero-img { object-fit: contain; }
 .hero-dots { position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; z-index: 2; }
 .hero-dots .dot { width: 9px; height: 9px; border-radius: 50%; border: 1px solid rgba(255,255,255,.9); background: transparent; padding: 0; cursor: pointer; }
 .hero-dots .dot.on { background: var(--gold); border-color: var(--gold); }
-@media (prefers-reduced-motion: reduce) { .hero-img { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .hero-slide { transition: none; } }
 .hero-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14, 24, 20, .4) 0%, rgba(14, 24, 20, 0) 22%, rgba(14, 24, 20, 0) 45%, rgba(14, 24, 20, .72) 100%); }
 .hero:not(.has-photo) { place-items: center; }
 .hero:not(.has-photo) .hero-shade { background: none; }

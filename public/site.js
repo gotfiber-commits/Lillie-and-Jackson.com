@@ -105,8 +105,11 @@
         </nav>
       </header>
 
-      <section class="hero ${heroList.length ? "has-photo" : ""} h-${["full", "mid", "short"].includes(s.heroHeight) ? s.heroHeight : "mid"}" id="top">
-        ${heroList.map((id, i) => `<img class="hero-img ${i === 0 ? "on" : ""}" src="${photo(id)}" alt="${i === 0 ? `${esc(n1)} and ${esc(n2)}` : ""}" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}/>`).join("")}
+      <section class="hero ${heroList.length ? "has-photo" : ""} h-${["full", "mid", "short"].includes(s.heroHeight) ? s.heroHeight : "mid"} ${s.heroFit === "whole" ? "fit-whole" : ""}" id="top">
+        ${heroList.map((id, i) => `<span class="hero-slide ${i === 0 ? "on" : ""}">
+          ${s.heroFit === "whole" ? `<img class="hero-blur" src="${photo(id)}" alt="" aria-hidden="true" ${i === 0 ? "" : 'loading="lazy"'}/>` : ""}
+          <img class="hero-img" src="${photo(id)}" alt="${i === 0 ? `${esc(n1)} and ${esc(n2)}` : ""}" ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}/>
+        </span>`).join("")}
         <div class="hero-shade"></div>
         ${heroList.length > 1 ? `<div class="hero-dots" role="tablist" aria-label="Cover photos">${heroList.map((_, i) => `<button type="button" class="dot ${i === 0 ? "on" : ""}" data-slide="${i}" aria-label="Photo ${i + 1}"></button>`).join("")}</div>` : ""}
         <div class="hero-content">
@@ -257,7 +260,7 @@
 
   function startSlideshow(count) {
     if (count < 2) return;
-    const imgs = [...document.querySelectorAll(".hero-img")];
+    const imgs = [...document.querySelectorAll(".hero-slide")];
     const dots = [...document.querySelectorAll(".hero-dots .dot")];
     let idx = 0, timer = null;
     const show = (i) => {

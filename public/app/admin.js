@@ -30,7 +30,7 @@
       headline: "We're getting married",
       intro: "We can't wait to celebrate with the people we love most. Here's everything you need to know about the day.",
       hashtag: "", contactEmail: "", footerNote: "",
-      heroPhoto: "", heroPhotos: [], heroHeight: "mid",
+      heroPhoto: "", heroPhotos: [], heroHeight: "mid", heroFit: "crop",
       story: { title: "Our story", body: "", photo: "", photo2: "" },
       events: [
         { id: uid(), title: "Ceremony", date: s.date || "", time: "16:00", endTime: "", venue: s.venue || "", address: "", dress: "", notes: "" },
@@ -54,6 +54,7 @@
     // Older content stored a single cover photo
     if (!out.heroPhotos.length && out.heroPhoto) out.heroPhotos = [out.heroPhoto];
     if (!["full", "mid", "short"].includes(out.heroHeight)) out.heroHeight = "mid";
+    if (!["crop", "whole"].includes(out.heroFit)) out.heroFit = "crop";
     out.heroPhoto = out.heroPhotos[0] || "";
     if (!Array.isArray(out.travel.hotels)) out.travel.hotels = [];
     return out;
@@ -572,6 +573,10 @@
             { value: "mid", label: "Standard (about two-thirds of the screen)" },
             { value: "full", label: "Full screen" },
           ], hint: "Smaller sizes crop close-up photos less." },
+          { key: "heroFit", label: "Cover photo fit", type: "select", options: [
+            { value: "crop", label: "Fill the space (photo may be cropped)" },
+            { value: "whole", label: "Show the whole photo (never cropped)" },
+          ], hint: "Show the whole photo guarantees everyone stays visible. The empty space around it becomes a soft blur of the same photo." },
           { key: "hashtag", label: "Wedding hashtag", placeholder: "#SamAndAlex2027" },
           { key: "intro", label: "Welcome message", type: "textarea", rows: 3 },
           { key: "contactEmail", label: "Contact email for guests", type: "email" },
